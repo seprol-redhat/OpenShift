@@ -31,7 +31,8 @@
 
 ## Exposing a default registry manually
 
-- Endereço: `default-route-openshift-image-registry.apps.dev.labredhat.seprol`
+- External access by exposing it with a route
+- Endereço externo: `default-route-openshift-image-registry.apps.dev.labredhat.seprol`
 - https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/registry/securing-exposing-registry#registry-exposing-default-registry-manually_securing-exposing-registry
 
 ## Configuring image registry settings
@@ -102,6 +103,9 @@ oc new-build \
 
 oc start-build ubi9 --from-dir=. -w -F
 ```
+
+- Pruning builds
+  - https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/building_applications/pruning-objects#pruning-builds_pruning-objects
 
 ## Pruning images
 
