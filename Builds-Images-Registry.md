@@ -19,6 +19,7 @@
 ## Referencias
 
 - https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/registry/index
+- https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/images/index
 
 ## Integrated OpenShift image registry
 
