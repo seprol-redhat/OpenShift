@@ -1,18 +1,18 @@
-# Images & Registry
+# Builds & Images & Registry
 
-- [Images \& Registry](#images--registry)
+- [Builds \& Images \& Registry](#builds--images--registry)
   - [Referencias](#referencias)
   - [Namespace padrão](#namespace-padrão)
-  - [Server](#server)
+  - [Server - Registry](#server---registry)
   - [Exposing a default registry manually](#exposing-a-default-registry-manually)
-  - [Dockerfile](#dockerfile)
+  - [Dockerfile exemplo](#dockerfile-exemplo)
   - [By Podman](#by-podman)
   - [By oc command](#by-oc-command)
   - [By build on OpenShift](#by-build-on-openshift)
   - [Pruning images](#pruning-images)
   - [Opções](#opções)
   - [Comandos gerais](#comandos-gerais)
-  - [Deploy](#deploy)
+  - [Deploy exemplo](#deploy-exemplo)
 
 ## Referencias
 
@@ -22,7 +22,7 @@
 
 - `openshift`
 
-## Server
+## Server - Registry
 
 - image-registry.openshift-image-registry.svc:5000
 - default-route-openshift-image-registry.apps.dev.labredhat.seprol
@@ -31,7 +31,7 @@
 
 - https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/registry/securing-exposing-registry#registry-exposing-default-registry-manually_securing-exposing-registry
 
-## Dockerfile
+## Dockerfile exemplo
 
 ```Dockerfile
 FROM registry.access.redhat.com/ubi9/ubi
@@ -53,7 +53,7 @@ podman build -t ubi9/ubi:<tag> .
 
 oc project <project>
 
-podman login --tls-verify=false -u=raphael.cherobim -p=$(oc whoami -t) default-route-openshift-image-registry.apps.dev.labredhat.seprol
+podman login --tls-verify=false -u=<user> -p=$(oc whoami -t) default-route-openshift-image-registry.apps.dev.labredhat.seprol
 
 podman push --tls-verify=false --remove-signatures localhost/ubi9/ubi:<tag> default-route-openshift-image-registry.apps.dev.labredhat.seprol/<project>/ubi9:<tag>
 ```
@@ -108,7 +108,7 @@ oc adm prune images --keep-tag-revisions=2 --keep-younger-than=0 --registry-url=
 oc get istag
 ```
 
-## Deploy
+## Deploy exemplo
 
 ```yaml
 kind: Deployment
