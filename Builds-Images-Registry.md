@@ -13,9 +13,8 @@
   - [Push by oc command](#push-by-oc-command)
   - [Push by build on OpenShift](#push-by-build-on-openshift)
   - [Pruning images](#pruning-images)
-  - [Opções](#opções)
-  - [Comandos gerais](#comandos-gerais)
   - [Deploy exemplo](#deploy-exemplo)
+    - [Trigger update](#trigger-update)
 
 ## Referencias
 
@@ -24,8 +23,8 @@
 
 ## Registro de imagens integrado ao OpenShift
 
-- O namespace `openshift` armazenas diversas imagens criadas a partir da instalação
-- Localize as imagens em: Builds -> ImageStreams
+- Localização: Administrator -> Builds -> ImageStreams
+
 - Endereço interno: `image-registry.openshift-image-registry.svc:5000`
 
 - As imagens podem ser armazenas em qualquer namespace
@@ -78,24 +77,22 @@ CMD ["sleep", "infinity"]
 ## Push by Podman
 
 ```sh
-podman build -t ubi9/ubi:<tag> .
+podman build -t custom-ubi9:<tag> .
 
 oc project <project>
 
 podman login --tls-verify=false -u=<user> -p=$(oc whoami -t) default-route-openshift-image-registry.apps.dev.labredhat.seprol
 
-podman push --tls-verify=false localhost/ubi9/ubi:<tag> default-route-openshift-image-registry.apps.dev.labredhat.seprol/<project>/ubi9:<tag>
+podman push --tls-verify=false localhost/custom-ubi9:<tag> default-route-openshift-image-registry.apps.dev.labredhat.seprol/<project>/custom-ubi9:<tag>
 # --remove-signatures
 ```
 
 ## Push by oc command
 
-- Não funciona para imagens em localhost
+- Não funciona para imagens locais
+- A imagem tem que estar em um registro com acesso externo
 
 ```sh
-podman pull registry.access.redhat.com/ubi9
-podman images
-
 oc project <project>
 
 #oc create imagestream <new-imagestream-name>
@@ -112,9 +109,11 @@ oc new-build \
   --strategy=docker \
   --name=ubi9 \
   -l "app=ubi9" \
-  --to="image-registry.openshift-image-registry.svc:5000/<project>/ubi9"
+  --to="image-registry.openshift-image-registry.svc:5000/<project>/custom-ubi9:latest"
 
 oc start-build ubi9 --from-dir=. -w -F
+
+oc tag custom-ubi9:latest custom-ubi9:<tag>
 ```
 
 - Pruning builds
@@ -125,19 +124,7 @@ oc start-build ubi9 --from-dir=. -w -F
 - https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/building_applications/pruning-objects#pruning-images_pruning-objects
 
 ```sh
-oc adm prune images --keep-tag-revisions=2 --keep-younger-than=0 --registry-url=https://default-route-openshift-image-registry.apps.dev.labredhat.seprol --confirm -n <project>
-```
-
-## Opções
-
-```sh
---scheduled=true
-```
-
-## Comandos gerais
-
-```sh
-oc get istag
+oc adm prune images --keep-tag-revisions=3 --keep-younger-than=0 --registry-url=https://default-route-openshift-image-registry.apps.dev.labredhat.seprol --confirm -n <project>
 ```
 
 ## Deploy exemplo
@@ -165,5 +152,13 @@ spec:
             - sh
             - "-c"
             - echo The app is running! && printenv && sleep infinity
-          image: image-registry.openshift-image-registry.svc:5000/<ns>/ubi9:<n>
+          image: image-registry.openshift-image-registry.svc:5000/<ns>/custom-ubi9:<n>
+```
+
+### Trigger update
+
+```yaml
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"custom-ubi9:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"ubi9-testes\")].image"}]'
 ```
