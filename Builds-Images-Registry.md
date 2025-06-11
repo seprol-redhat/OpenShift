@@ -27,7 +27,7 @@
   - Administrator -> Builds -> ImageStreams
   - Developer -> Search -> ImageStream
 
-- Endereço interno: `image-registry.openshift-image-registry.svc:5000`
+- Endereço interno: `image-registry.openshift-image-registry.svc:5000/<project>/<image-name>:<tag>`
 
 - As imagens podem ser armazenas em qualquer namespace
   - É recomendado que as imagens dos Apps estejam no mesmo namespace do App
