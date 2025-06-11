@@ -23,7 +23,9 @@
 
 ## Registro de imagens integrado ao OpenShift
 
-- Localização: Administrator -> Builds -> ImageStreams
+- Localização:
+  - Administrator -> Builds -> ImageStreams
+  - Developer -> Search -> ImageStream
 
 - Endereço interno: `image-registry.openshift-image-registry.svc:5000`
 
@@ -156,6 +158,8 @@ spec:
 ```
 
 ### Trigger update
+
+- Adicionar ao deployment
 
 ```yaml
 metadata:
